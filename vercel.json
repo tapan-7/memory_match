@@ -1,31 +1,12 @@
 {
-    "routes": [
+    "rewrites": [
         {
-            "src": "^/$",
-            "dest": "/index.html"
+            "source": "/",
+            "destination": "/index.html"
         },
         {
-            "src": "^/game$",
-            "dest": "/game.html"
-        },
-        {
-            "src": "^/explore$",
-            "dest": "/explore.html"
-        },
-        {
-            "src": "^/victory$",
-            "dest": "/victory.html"
-        },
-        {
-            "src": "^/modal$",
-            "dest": "/modal.html"
-        },
-        {
-            "handle": "filesystem"
-        },
-        {
-            "src": ".*",
-            "dest": "/+not-found.html"
+            "source": "/:path",
+            "destination": "/:path.html"
         }
     ]
 }
