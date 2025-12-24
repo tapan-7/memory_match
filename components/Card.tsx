@@ -1,10 +1,12 @@
 import React, { useEffect } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   Extrapolation,
   interpolate,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
+  withSequence,
   withSpring
 } from "react-native-reanimated";
 import { COLORS } from "../utils/constants";
@@ -15,6 +17,7 @@ interface CardProps {
   isMatched: boolean;
   onPress: () => void;
   disabled?: boolean;
+  index: number;
 }
 
 const Card: React.FC<CardProps> = ({
@@ -23,20 +26,37 @@ const Card: React.FC<CardProps> = ({
   isMatched,
   onPress,
   disabled = false,
+  index,
 }) => {
   const rotateY = useSharedValue(0);
-  const scale = useSharedValue(1);
+  const scale = useSharedValue(0); // For entrance animation
+  const skew = useSharedValue(0);
+
+  useEffect(() => {
+    // Entrance animation "Card Swap" feel
+    if (Platform.OS === 'web') {
+      scale.value = withDelay(index * 30, withSpring(1));
+    } else {
+      scale.value = withDelay(
+        index * 50,
+        withSpring(1, { damping: 20, stiffness: 60 })
+      );
+    }
+  }, []);
 
   useEffect(() => {
     rotateY.value = withSpring(isFlipped ? 180 : 0, {
-      damping: 15,
-      stiffness: 100,
+      damping: 20,
+      stiffness: 80,
     });
   }, [isFlipped]);
 
   useEffect(() => {
     if (isMatched) {
-      scale.value = withSpring(0.95, { damping: 10 });
+      scale.value = withSequence(
+        withSpring(1.05, { damping: 15 }),
+        withSpring(1, { damping: 15 })
+      );
     }
   }, [isMatched]);
 
@@ -80,20 +100,19 @@ const Card: React.FC<CardProps> = ({
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled || isMatched}
-      activeOpacity={0.9}
+      activeOpacity={0.8}
       style={styles.container}
     >
       {/* Card Back (hidden state) */}
       <Animated.View
         style={[styles.cardFace, styles.cardBack, frontAnimatedStyle]}
       >
-        <View style={styles.cardBackInner}>
-          <View style={styles.dotPattern}>
-            {[...Array(9)].map((_, i) => (
-              <View key={i} style={styles.dot} />
-            ))}
-          </View>
-        </View>
+        <Image
+          source={require("../assets/images/card_back.png")}
+          style={styles.cardBackImage}
+          resizeMode="cover"
+        />
+        <View style={styles.overlay} />
       </Animated.View>
 
       {/* Card Front (revealed state) */}
@@ -105,7 +124,10 @@ const Card: React.FC<CardProps> = ({
           isMatched && styles.cardMatched,
         ]}
       >
-        <Text style={styles.emoji}>{emoji}</Text>
+        <View style={styles.frontInner}>
+          <Text style={styles.emoji}>{emoji}</Text>
+          {isMatched && <View style={styles.matchedCheck} />}
+        </View>
       </Animated.View>
     </TouchableOpacity>
   );
@@ -113,60 +135,60 @@ const Card: React.FC<CardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    aspectRatio: 1,
-    padding: 4,
+    aspectRatio: 0.75, // More card-like aspect ratio
+    padding: 6,
   },
   cardFace: {
     position: "absolute",
     width: "100%",
     height: "100%",
     backfaceVisibility: "hidden",
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
+    borderRadius: 16,
+    overflow: Platform.OS === 'web' ? 'visible' : 'hidden', // Some web browsers have issues with hidden overflow + backface
+    borderWidth: 1.5,
   },
   cardBack: {
     backgroundColor: COLORS.cardBack,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.primary,
   },
-  cardBackInner: {
+  cardBackImage: {
+    width: "100%",
+    height: "100%",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.1)",
+  },
+  cardFront: {
+    backgroundColor: COLORS.card,
+    borderColor: COLORS.border,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  frontInner: {
     width: "100%",
     height: "100%",
     justifyContent: "center",
     alignItems: "center",
-  },
-  dotPattern: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    width: 24,
-    height: 24,
-    gap: 4,
-  },
-  dot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: COLORS.textLight,
-    opacity: 0.3,
-  },
-  cardFront: {
-    backgroundColor: COLORS.card,
-    borderWidth: 2,
-    borderColor: COLORS.primary,
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: "rgba(255,255,255,0.05)",
   },
   cardMatched: {
     backgroundColor: COLORS.cardMatched,
-    borderColor: COLORS.success,
+    borderColor: COLORS.secondary,
+    borderWidth: 2,
   },
   emoji: {
-    fontSize: 32,
+    fontSize: 36,
   },
+  matchedCheck: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.secondary,
+  }
 });
 
 export default Card;

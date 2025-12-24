@@ -12,22 +12,26 @@ export const useSound = () => {
 
   const playSound = async (type: SoundType) => {
     try {
+      let player;
       switch (type) {
         case "flip":
-          flipPlayer.seekTo(0);
-          flipPlayer.play();
+          player = flipPlayer;
           break;
         case "match":
-          matchPlayer.seekTo(0);
-          matchPlayer.play();
+          player = matchPlayer;
           break;
         case "complete":
-          completePlayer.seekTo(0);
-          completePlayer.play();
+          player = completePlayer;
           break;
       }
+
+      if (player) {
+        player.pause();
+        player.seekTo(0);
+        player.play();
+      }
     } catch (error) {
-      console.log("Error playing sound:", error);
+      console.log(`Error playing ${type} sound:`, error);
     }
   };
 

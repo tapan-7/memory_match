@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect } from "react";
-import { Dimensions, StatusBar, StyleSheet, View } from "react-native";
+import { Dimensions, ImageBackground, StatusBar, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Card from "../components/Card";
 import ComboPopup from "../components/ComboPopup";
@@ -56,15 +56,28 @@ export default function GameScreen() {
     }
   }, [gameWon]);
 
-  const cardSize = Math.min((width - 80) / level.cols, 80);
+  // Responsive card size calculation
+  const isDesktop = width > 768;
+  const horizontalPadding = isDesktop ? 40 : 20;
+  const maxBoardWidth = isDesktop ? 800 : width - 40;
+
+  const cardWidth = Math.min(
+    (maxBoardWidth - (level.cols - 1) * 10) / level.cols,
+    isDesktop ? 120 : 80
+  );
+  const cardHeight = cardWidth / 0.75;
 
   const handleQuit = () => {
     router.back();
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+    <ImageBackground
+      source={require("../assets/images/dashboard_bg.png")}
+      style={styles.container}
+      resizeMode="cover"
+    >
+      <StatusBar barStyle="light-content" />
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
           {/* Score Bar */}
@@ -81,8 +94,8 @@ export default function GameScreen() {
 
           {/* Game Board */}
           <View style={styles.boardWrapper}>
-            <View style={styles.board}>
-              {cards.map((card) => {
+            <View style={[styles.board, { maxWidth: maxBoardWidth }]}>
+              {cards.map((card, index) => {
                 const isFlipped =
                   flippedCards.includes(card.id) ||
                   matchedPairs.includes(card.id);
@@ -91,7 +104,11 @@ export default function GameScreen() {
                 return (
                   <View
                     key={card.id}
-                    style={{ width: cardSize, height: cardSize }}
+                    style={{
+                      width: cardWidth,
+                      height: cardHeight,
+                      margin: isDesktop ? 6 : 4
+                    }}
                   >
                     <Card
                       emoji={card.emoji}
@@ -99,6 +116,7 @@ export default function GameScreen() {
                       isMatched={isMatched}
                       onPress={() => handleCardPress(card.id)}
                       disabled={isMatched}
+                      index={index}
                     />
                   </View>
                 );
@@ -110,7 +128,7 @@ export default function GameScreen() {
           <ProgressBar current={matchedPairs.length / 2} total={level.pairs} />
         </View>
       </SafeAreaView>
-    </View>
+    </ImageBackground>
   );
 }
 

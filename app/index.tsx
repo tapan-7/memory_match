@@ -1,6 +1,8 @@
 import { router } from "expo-router";
 import React from "react";
 import {
+  Dimensions,
+  ImageBackground,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -12,8 +14,11 @@ import LevelButton from "../components/LevelButton";
 import { useStorage } from "../hooks/useStorage";
 import { COLORS, LEVELS } from "../utils/constants";
 
+const { width } = Dimensions.get("window");
+
 export default function HomeScreen() {
   const [bestScore] = useStorage<number>("bestScore", 0);
+  const isDesktop = width > 768;
 
   const handleStartGame = (levelId: number) => {
     router.push({
@@ -23,40 +28,57 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+    <ImageBackground
+      source={require("../assets/images/dashboard_bg.png")}
+      style={styles.container}
+      resizeMode="cover"
+    >
+      <StatusBar barStyle="light-content" />
       <SafeAreaView style={styles.safeArea}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.title}>Memory</Text>
-            {bestScore > 0 && (
-              <View style={styles.bestScoreContainer}>
-                <Text style={styles.bestScoreLabel}>Best Score</Text>
-                <Text style={styles.bestScoreValue}>{bestScore}</Text>
+        <View style={styles.centerWrapper}>
+          <ScrollView
+            contentContainerStyle={[
+              styles.scrollContent,
+              isDesktop && styles.desktopScrollContent
+            ]}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Header */}
+            <View style={styles.header}>
+              <Text style={styles.titlePrefix}>MEMORY</Text>
+              <Text style={styles.title}>MATCH</Text>
+
+              <View style={styles.statsRow}>
+                {bestScore > 0 && (
+                  <View style={styles.bestScoreContainer}>
+                    <Text style={styles.bestScoreLabel}>MASTER SCORE</Text>
+                    <Text style={styles.bestScoreValue}>{bestScore}</Text>
+                  </View>
+                )}
               </View>
-            )}
-          </View>
+            </View>
 
-          {/* Subtitle */}
-          <Text style={styles.subtitle}>Choose a level to start</Text>
+            {/* Subtitle */}
+            <View style={styles.subtitleContainer}>
+              <View style={styles.line} />
+              <Text style={styles.subtitle}>SELECT MISSION</Text>
+              <View style={styles.line} />
+            </View>
 
-          {/* Level Grid */}
-          <View style={styles.levelsContainer}>
-            {LEVELS.map((level) => (
-              <LevelButton
-                key={level.id}
-                level={level}
-                onPress={() => handleStartGame(level.id)}
-              />
-            ))}
-          </View>
-        </ScrollView>
+            {/* Level Grid */}
+            <View style={styles.levelsContainer}>
+              {LEVELS.map((level) => (
+                <LevelButton
+                  key={level.id}
+                  level={level}
+                  onPress={() => handleStartGame(level.id)}
+                />
+              ))}
+            </View>
+          </ScrollView>
+        </View>
       </SafeAreaView>
-    </View>
+    </ImageBackground>
   );
 }
 
@@ -68,49 +90,89 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
+  centerWrapper: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   scrollContent: {
-    padding: 20,
+    padding: 24,
+    paddingBottom: 40,
+    width: "100%",
+  },
+  desktopScrollContent: {
+    maxWidth: 600,
   },
   header: {
-    marginTop: 20,
-    marginBottom: 8,
+    marginTop: 40,
+    marginBottom: 40,
+    alignItems: "center",
+  },
+  titlePrefix: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: COLORS.primary,
+    letterSpacing: 8,
+    marginBottom: -10,
   },
   title: {
-    fontSize: 48,
+    fontSize: 72,
     fontWeight: "900",
     color: COLORS.text,
     letterSpacing: -2,
+    textShadowColor: COLORS.primary,
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 30,
+  },
+  statsRow: {
+    marginTop: 20,
+    flexDirection: "row",
+    gap: 12,
   },
   bestScoreContainer: {
-    marginTop: 16,
     paddingVertical: 12,
-    paddingHorizontal: 20,
-    backgroundColor: COLORS.card,
-    borderRadius: 12,
+    paddingHorizontal: 24,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    alignSelf: "flex-start",
+    borderColor: "rgba(255, 255, 255, 0.2)",
+    alignItems: "center",
+    minWidth: 160,
   },
   bestScoreLabel: {
-    fontSize: 11,
+    fontSize: 10,
     color: COLORS.textLight,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
+    fontWeight: "700",
+    letterSpacing: 2,
   },
   bestScoreValue: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: "900",
-    color: COLORS.primary,
-    marginTop: 4,
+    color: COLORS.gold,
+    marginTop: 2,
+  },
+  subtitleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 32,
+    gap: 16,
+  },
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
   },
   subtitle: {
-    fontSize: 16,
-    color: COLORS.textLight,
-    marginBottom: 24,
+    fontSize: 14,
+    fontWeight: "800",
+    color: COLORS.text,
+    letterSpacing: 4,
   },
   levelsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
+    justifyContent: "center",
+    gap: 16,
+    paddingHorizontal: 10,
   },
 });

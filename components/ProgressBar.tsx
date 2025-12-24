@@ -21,7 +21,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ current, total }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.label}>Progress</Text>
+        <Text style={styles.label}>PROGRESS</Text>
         <Text style={styles.value}>
           {current} / {total}
         </Text>
@@ -36,38 +36,38 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ current, total }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.card,
-    borderRadius: 16,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 20,
     padding: 16,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: "rgba(255, 255, 255, 0.2)",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 12,
+    marginBottom: 10,
   },
   label: {
-    fontSize: 13,
+    fontSize: 10,
     color: COLORS.textLight,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
+    fontWeight: "900",
+    letterSpacing: 1.5,
   },
   value: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: COLORS.text,
+    fontSize: 12,
+    fontWeight: "900",
+    color: "#FFF",
   },
   barBackground: {
-    height: 8,
-    backgroundColor: COLORS.bgDark,
-    borderRadius: 4,
+    height: 6,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 3,
     overflow: "hidden",
   },
   barFill: {
     height: "100%",
-    backgroundColor: COLORS.primary,
-    borderRadius: 4,
+    backgroundColor: COLORS.secondary,
+    borderRadius: 3,
   },
 });
 

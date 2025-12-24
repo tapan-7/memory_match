@@ -14,7 +14,7 @@ export interface Level {
   theme: ThemeKey;
 }
 
-export type ThemeKey = "minimal" | "nature" | "objects" | "symbols";
+export type ThemeKey = "minimal" | "nature" | "objects" | "symbols" | "space" | "magic" | "gems" | "shapes";
 
 export interface Themes {
   [key: string]: string[];

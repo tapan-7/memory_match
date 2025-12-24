@@ -23,16 +23,16 @@ const ComboPopup: React.FC<ComboPopupProps> = ({ combo, visible }) => {
   useEffect(() => {
     if (visible && combo > 1) {
       scale.value = withSequence(
-        withSpring(1.1, { damping: 8 }),
-        withSpring(1, { damping: 10 })
+        withSpring(1.15, { damping: 20, stiffness: 80 }),
+        withSpring(1, { damping: 15 })
       );
       opacity.value = withSequence(
         withTiming(1, { duration: 200 }),
-        withDelay(800, withTiming(0, { duration: 200 }))
+        withDelay(1200, withTiming(0, { duration: 400 }))
       );
       translateY.value = withSequence(
-        withSpring(0, { damping: 10 }),
-        withDelay(800, withTiming(-20, { duration: 200 }))
+        withSpring(0, { damping: 20, stiffness: 80 }),
+        withDelay(1200, withTiming(-10, { duration: 400 }))
       );
     }
   }, [visible, combo]);
@@ -46,7 +46,7 @@ const ComboPopup: React.FC<ComboPopupProps> = ({ combo, visible }) => {
 
   return (
     <Animated.View style={[styles.container, animatedStyle]}>
-      <Text style={styles.text}>{combo}× Combo!</Text>
+      <Text style={styles.text}>{combo}× COMBO!</Text>
     </Animated.View>
   );
 };
@@ -54,25 +54,28 @@ const ComboPopup: React.FC<ComboPopupProps> = ({ combo, visible }) => {
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    top: "30%",
+    top: "40%",
     alignSelf: "center",
-    backgroundColor: COLORS.card,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
+    backgroundColor: "rgba(255, 215, 0, 0.2)",
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 24,
     borderWidth: 2,
-    borderColor: COLORS.primary,
-    zIndex: 1000,
-    elevation: 8,
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    borderColor: COLORS.gold,
+    zIndex: 2000,
+    elevation: 10,
+    shadowColor: COLORS.gold,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 15,
   },
   text: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: COLORS.primary,
+    fontSize: 28,
+    fontWeight: "900",
+    color: COLORS.gold,
+    textShadowColor: "rgba(0,0,0,0.5)",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 4,
   },
 });
 

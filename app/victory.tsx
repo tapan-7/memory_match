@@ -2,6 +2,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React from "react";
 import {
+  Dimensions,
+  ImageBackground,
   StatusBar,
   StyleSheet,
   Text,
@@ -12,6 +14,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { COLORS, LEVELS } from "../utils/constants";
 import { formatTime } from "../utils/gameHelpers";
 
+const { width } = Dimensions.get("window");
+
 export default function VictoryScreen() {
   const params = useLocalSearchParams();
 
@@ -20,6 +24,8 @@ export default function VictoryScreen() {
   const time = parseInt(params.time as string);
   const moves = parseInt(params.moves as string);
   const combo = parseInt(params.combo as string);
+
+  const isDesktop = width > 768;
 
   const level = LEVELS[levelId - 1];
   const hasNextLevel = levelId < LEVELS.length;
@@ -43,92 +49,100 @@ export default function VictoryScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+    <ImageBackground
+      source={require("../assets/images/dashboard_bg.png")}
+      style={styles.container}
+      resizeMode="cover"
+    >
+      <StatusBar barStyle="light-content" />
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.content}>
-          {/* Success Icon */}
-          <View style={styles.iconContainer}>
-            <Ionicons
-              name="checkmark-circle"
-              size={80}
-              color={COLORS.success}
-            />
-          </View>
-
-          {/* Title */}
-          <Text style={styles.title}>Level Complete!</Text>
-          <Text style={styles.subtitle}>
-            Level {level.id} • {level.name}
-          </Text>
-
-          {/* Score */}
-          <View style={styles.scoreContainer}>
-            <Text style={styles.scoreLabel}>Score</Text>
-            <Text style={styles.scoreValue}>{score}</Text>
-          </View>
-
-          {/* Stats */}
-          <View style={styles.statsContainer}>
-            <View style={styles.statBox}>
-              <Ionicons name="time-outline" size={24} color={COLORS.primary} />
-              <Text style={styles.statValue}>{formatTime(time)}</Text>
-              <Text style={styles.statLabel}>Time</Text>
+        <View style={styles.centerWrapper}>
+          <View style={[styles.content, isDesktop && styles.desktopContent]}>
+            {/* Success Icon */}
+            <View style={styles.iconContainer}>
+              <View style={styles.iconBg}>
+                <Ionicons
+                  name="trophy"
+                  size={80}
+                  color={COLORS.gold}
+                />
+              </View>
             </View>
 
-            <View style={styles.statBox}>
-              <Ionicons
-                name="footsteps-outline"
-                size={24}
-                color={COLORS.primary}
-              />
-              <Text style={styles.statValue}>{moves}</Text>
-              <Text style={styles.statLabel}>Moves</Text>
+            {/* Title */}
+            <Text style={styles.title}>MISSION COMPLETE</Text>
+            <Text style={styles.subtitle}>
+              LEVEL {level.id} • {level.name.toUpperCase()}
+            </Text>
+
+            {/* Score */}
+            <View style={styles.scoreContainer}>
+              <Text style={styles.scoreLabel}>TOTAL SCORE</Text>
+              <Text style={styles.scoreValue}>{score}</Text>
             </View>
 
-            <View style={styles.statBox}>
-              <Ionicons name="flash" size={24} color={COLORS.primary} />
-              <Text style={styles.statValue}>{combo}×</Text>
-              <Text style={styles.statLabel}>Best Combo</Text>
+            {/* Stats */}
+            <View style={styles.statsContainer}>
+              <View style={styles.statBox}>
+                <Ionicons name="time" size={24} color={COLORS.primary} />
+                <Text style={styles.statValue}>{formatTime(time)}</Text>
+                <Text style={styles.statLabel}>TIME</Text>
+              </View>
+
+              <View style={styles.statBox}>
+                <Ionicons
+                  name="footsteps"
+                  size={24}
+                  color={COLORS.primary}
+                />
+                <Text style={styles.statValue}>{moves}</Text>
+                <Text style={styles.statLabel}>MOVES</Text>
+              </View>
+
+              <View style={styles.statBox}>
+                <Ionicons name="flash" size={24} color={COLORS.accent} />
+                <Text style={styles.statValue}>{combo}×</Text>
+                <Text style={styles.statLabel}>COMBO</Text>
+              </View>
             </View>
-          </View>
 
-          {/* Buttons */}
-          <View style={styles.buttonsContainer}>
-            <TouchableOpacity
-              onPress={handleReplay}
-              style={styles.button}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="refresh" size={20} color={COLORS.text} />
-              <Text style={styles.buttonText}>Replay</Text>
-            </TouchableOpacity>
+            {/* Buttons */}
+            <View style={styles.buttonsContainer}>
+              {hasNextLevel && (
+                <TouchableOpacity
+                  onPress={handleNextLevel}
+                  style={[styles.button, styles.buttonPrimary]}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.buttonTextPrimary}>NEXT MISSION</Text>
+                  <Ionicons name="arrow-forward" size={20} color="#FFF" />
+                </TouchableOpacity>
+              )}
 
-            {hasNextLevel && (
-              <TouchableOpacity
-                onPress={handleNextLevel}
-                style={[styles.button, styles.buttonPrimary]}
-                activeOpacity={0.7}
-              >
-                <Text style={[styles.buttonText, styles.buttonTextPrimary]}>
-                  Next Level
-                </Text>
-                <Ionicons name="arrow-forward" size={20} color="#FFF" />
-              </TouchableOpacity>
-            )}
+              <View style={styles.rowButtons}>
+                <TouchableOpacity
+                  onPress={handleReplay}
+                  style={[styles.button, styles.flexButton]}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="refresh" size={20} color="#FFF" />
+                  <Text style={styles.buttonText}>RETRY</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={handleHome}
-              style={styles.button}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="home" size={20} color={COLORS.text} />
-              <Text style={styles.buttonText}>Home</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleHome}
+                  style={[styles.button, styles.flexButton]}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="home" size={20} color="#FFF" />
+                  <Text style={styles.buttonText}>MENU</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
         </View>
       </SafeAreaView>
-    </View>
+    </ImageBackground>
   );
 }
 
@@ -140,99 +154,147 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
+  centerWrapper: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   content: {
     flex: 1,
-    padding: 20,
+    padding: 24,
     justifyContent: "center",
     alignItems: "center",
+    width: "100%",
+  },
+  desktopContent: {
+    maxWidth: 600,
   },
   iconContainer: {
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 36,
-    fontWeight: "900",
-    color: COLORS.text,
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: COLORS.textLight,
     marginBottom: 32,
   },
+  iconBg: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "rgba(255, 255, 255, 0.2)",
+    shadowColor: COLORS.gold,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: "900",
+    color: "#FFF",
+    marginBottom: 8,
+    letterSpacing: 2,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: COLORS.textLight,
+    fontWeight: "800",
+    marginBottom: 40,
+    letterSpacing: 4,
+  },
   scoreContainer: {
-    backgroundColor: COLORS.card,
-    borderRadius: 16,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 24,
     padding: 24,
     alignItems: "center",
-    marginBottom: 24,
-    borderWidth: 2,
-    borderColor: COLORS.primary,
-    minWidth: 200,
+    marginBottom: 32,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.2)",
+    minWidth: 240,
   },
   scoreLabel: {
-    fontSize: 13,
+    fontSize: 10,
     color: COLORS.textLight,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
+    fontWeight: "900",
+    letterSpacing: 2,
     marginBottom: 8,
   },
   scoreValue: {
-    fontSize: 48,
+    fontSize: 56,
     fontWeight: "900",
-    color: COLORS.primary,
+    color: COLORS.gold,
+    textShadowColor: COLORS.gold,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 15,
   },
   statsContainer: {
     flexDirection: "row",
     gap: 12,
-    marginBottom: 32,
+    marginBottom: 48,
   },
   statBox: {
-    backgroundColor: COLORS.card,
-    borderRadius: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    borderRadius: 20,
     padding: 16,
     alignItems: "center",
-    minWidth: 100,
+    flex: 1,
+    minWidth: 90,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: "rgba(255, 255, 255, 0.1)",
   },
   statValue: {
     fontSize: 18,
-    fontWeight: "700",
-    color: COLORS.text,
+    fontWeight: "900",
+    color: "#FFF",
     marginTop: 8,
   },
   statLabel: {
-    fontSize: 11,
+    fontSize: 9,
+    fontWeight: "800",
     color: COLORS.textLight,
     marginTop: 4,
+    letterSpacing: 1,
   },
   buttonsContainer: {
     width: "100%",
+    gap: 12,
+  },
+  rowButtons: {
+    flexDirection: "row",
     gap: 12,
   },
   button: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: COLORS.card,
-    borderRadius: 12,
-    paddingVertical: 16,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 16,
+    paddingVertical: 18,
     paddingHorizontal: 24,
-    gap: 8,
+    gap: 10,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: "rgba(255, 255, 255, 0.2)",
+  },
+  flexButton: {
+    flex: 1,
   },
   buttonPrimary: {
     backgroundColor: COLORS.primary,
     borderColor: COLORS.primary,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
   },
   buttonText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: COLORS.text,
+    fontSize: 14,
+    fontWeight: "900",
+    color: "#FFF",
+    letterSpacing: 1,
   },
   buttonTextPrimary: {
+    fontSize: 16,
+    fontWeight: "900",
     color: "#FFF",
+    letterSpacing: 2,
   },
 });
