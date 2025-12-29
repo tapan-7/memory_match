@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect } from "react";
 import { Dimensions, ImageBackground, StatusBar, StyleSheet, View } from "react-native";
@@ -17,6 +18,7 @@ const { width } = Dimensions.get("window");
 export default function GameScreen() {
   const params = useLocalSearchParams();
   const levelId = parseInt(params.levelId as string) || 1;
+  const navigation = useNavigation();
 
   const { playSound } = useSound();
   const [bestScore, setBestScore] = useStorage<number>("bestScore", 0);
@@ -68,7 +70,7 @@ export default function GameScreen() {
   const cardHeight = cardWidth / 0.75;
 
   const handleQuit = () => {
-    router.back();
+    navigation.goBack();
   };
 
   return (
